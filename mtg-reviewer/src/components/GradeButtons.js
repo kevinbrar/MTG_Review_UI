@@ -10,9 +10,16 @@ import React from 'react';
  * @param {object} props.currentCard - The card object currently being viewed.
  */
 function GradeButtons({ onGrade, currentCard }) {
-  // Define the grades to be rendered.
-  // This could be moved to a constants file later if we want.
-  const grades = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D', 'F', 'G'];
+  // --- V2 Change ---
+  // Updated the grades array per your request.
+  // We removed 'F' and added 'D+' and 'D-'.
+  const grades = [
+    'A+', 'A', 'A-', 
+    'B+', 'B', 'B-', 
+    'C+', 'C', 'C-', 
+    'D+', 'D', 'D-'
+    // We can also add 'G' back if you want, but this is a clean 12
+  ];
   
   // Guard Clause: If there is no card (still loading or end of list), 
   // render nothing (null).

@@ -1,68 +1,39 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 /**
  * A "dumb" UI component responsible for rendering a single card image.
- * It handles its own loading, "end of list," and "image not found" states
- * based on the props it receives.
+ * It assumes it is always given a valid card prop.
+ *
+ * It *does* manage its own internal "isFlipped" state for DFCs.
  *
  * @param {object} props - The component props.
- * @param {object} props.card - The card object from Scryfall. Can be undefined.
- * @param {boolean} props.isLoading - True if the card list is still loading.
+ * @param {object} props.card - The card object from Scryfall. Assumed to be valid.
  */
-function CardViewer({ card, isLoading }) {
+function CardViewer({ card }) {
   
-  // 1. Handle the initial loading state (from useScryfall)
-  if (isLoading) {
-    return (
-      <div style={{ 
-        width: '100%', 
-        height: '370px', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        border: '1px solid #ccc',
-        borderRadius: '15px'
-      }}>
-        <p>Loading cards...</p>
-      </div>
-    );
-  }
+  // --- This component still manages its own DFC flip state ---
+  const [isFlipped, setIsFlipped] = useState(false);
   
-  // 2. Handle the "end of list" state (from useReview)
-  // This triggers when isLoading is false but there's no currentCard.
-  if (!card) {
-    return (
-      <div style={{ 
-        width: '100%', 
-        height: '370px', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        border: '1px solid #ccc',
-        borderRadius: '15px'
-      }}>
-        <p>All cards reviewed!</p>
-      </div>
-    );
-  }
+  // --- All `isLoading` and `!card` logic has been REMOVED ---
+  // The "manager" (App.js) is now responsible for that.
   
   // --- Robust Image URL Finding ---
-  // This logic safely finds the correct image, even for double-sided cards.
+  const isDfc = card.card_faces && card.card_faces.length > 0;
   
-  let imageUrl = card.image_uris?.normal;
-  
-  // Fallback for dual-faced cards (which you noted in your `poej_checkpoint_1.pdf`)
-  if (!imageUrl && card.card_faces && card.card_faces[0]) {
-    imageUrl = card.card_faces[0].image_uris?.normal;
-  }
-  
-  // Final fallback for any other missing images (e.g., Art Cards)
-  if (!imageUrl) {
-    imageUrl = "https://placehold.co/265x370?text=Image+Not+Found";
-  }
-  // --- End of Image Logic ---
+  let imageUrl = "https://placehold.co/265x370?text=Image+Not+Found"; // Default placeholder
 
-  // 3. The "Happy Path": Render the card image
+  if (isDfc) {
+    const faceToShow = isFlipped ? card.card_faces[1] : card.card_faces[0];
+    imageUrl = faceToShow.image_uris?.normal;
+  } else if (card.image_uris) {
+    imageUrl = card.image_uris.normal;
+  }
+  
+  const handleFlip = () => {
+    setIsFlipped(!isFlipped); // This toggles our local state
+  };
+  
+  // --- Render the card ---
   return (
     <div>
       <img 
@@ -70,6 +41,16 @@ function CardViewer({ card, isLoading }) {
         alt={card.name} 
         style={{ width: '100%', borderRadius: '15px' }} 
       />
+      
+      {/* The "Flip" button logic is still here, as it's card-specific */}
+      {isDfc && (
+        <button 
+          onClick={handleFlip}
+          style={{ width: '100%', marginTop: '10px', padding: '5px' }}
+        >
+          Flip Card
+        </button>
+      )}
     </div>
   );
 }
