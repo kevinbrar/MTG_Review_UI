@@ -17,7 +17,8 @@ function GradeButtons({ onGrade, currentCard }) {
     'A+', 'A', 'A-', 
     'B+', 'B', 'B-', 
     'C+', 'C', 'C-', 
-    'D+', 'D', 'D-'
+    'D+', 'D', 'D-',
+    'G'
     // We can also add 'G' back if you want, but this is a clean 12
   ];
   

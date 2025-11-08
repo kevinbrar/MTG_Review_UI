@@ -8,7 +8,7 @@ import DownloadButton from './components/DownloadButton.js';
 
 // --- V2 Refactor: New Placeholder Components ---
 import LoadingView from './components/LoadingView.js';
-import AllDoneView from './components/AllDoneView.js'; // This is needed to complete the UI logic
+import AllDoneView from './components/AllDoneView.js';
 
 // --- 2. Import all logic hooks ---
 import useScryfall from './hooks/useScryfall.js';
@@ -16,18 +16,19 @@ import useReview from './hooks/useReview.js';
 
 /**
  * The main application component.
- * Acts as the "manager" that brings all components and hooks together.
+ * Acts as the "manager" that connects all components and hooks.
  * It implements the top-level logic (Loading, All Done) to decide 
  * which view to render.
  */
 function App() {
   // --- Smart Hooks (The "Brain") ---
 
-  // Get all card data and loading status from our Scryfall hook.
+  // Get all card data and status from our Scryfall hook.
   const { cards, isLoading, setCode } = useScryfall(); 
   
-  // Get all review logic from our Review hook.
-  const { reviews, cardIndex, handleGrade } = useReview(cards.length);
+  // V2 CHANGE: Pass the 'cards' list to useReview so it can save metadata.
+  // This is the line that needs to change from the current state:
+  const { reviews, cardIndex, handleGrade } = useReview(cards.length, cards);
   
   // --- Derived State ---
   
@@ -77,8 +78,7 @@ function App() {
       
       {mainContent}
 
-      {/* The Download button always appears, regardless of the main content */}
-      {/* We pass it the completed reviews and setCode */}
+      {/* The Download button always appears */}
       <DownloadButton
         reviews={reviews}
         setCode={setCode}

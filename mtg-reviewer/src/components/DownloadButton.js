@@ -3,8 +3,6 @@ import React from 'react';
 /**
  * A "dumb" UI component that renders a "Download CSV" button.
  * It receives the completed `reviews` object and the `setCode` as props.
- * When clicked, it formats the reviews into a CSV string and
- * triggers a browser download.
  *
  * @param {object} props - The component props.
  * @param {object} props.reviews - The key-value object of all card grades.
@@ -14,39 +12,33 @@ function DownloadButton({ reviews, setCode }) {
 
   /**
    * Handles the button click event.
-   * Generates a CSV string from the `reviews` prop and initiates a download.
+   * Generates a CSV string from the `reviews` prop (including metadata)
+   * and initiates a download.
    */
   const handleDownload = () => {
     
     // 1. Generate CSV content from the reviews object.
-    // Start with a header row.
-    let csvContent = "Card,Grade\n";
+    // Updated header to include the new metadata fields.
+    let csvContent = "Name,Rating,Color,Rarity,Notes\n";
 
-    // Loop over the [key, value] pairs of the reviews object
-    // (e.g., [ ["Appa", "A"], ["Momo", "B+"] ])
-    for (const [cardName, grade] of Object.entries(reviews)) {
+    // Loop over the [cardName, metadataObject] pairs
+    for (const [cardName, metadata] of Object.entries(reviews)) {
+      // Robustly handle missing data and formatting
+      const rating = metadata.grade || '';
+      const color = metadata.color || '';
+      const rarity = metadata.rarity || '';
+      const notes = metadata.notes || ''; // Placeholder for V3 feature
+      
       // Add quotes around card names to handle potential commas
-      // (e.g., "Aang, at the Crossroads")
-      csvContent += `"${cardName}",${grade}\n`;
+      csvContent += `"${cardName}",${rating},${color},${rarity},"${notes}"\n`;
     }
 
     // 2. Trigger the browser download.
-    // This "invisible link" trick is a standard, safe way to
-    // prompt a file download from client-side JavaScript.
-    
-    // Create a "Blob" (a file-like object in memory)
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    
-    // Create an invisible 'a' (link) element
     const link = document.createElement('a');
-    
-    // Set the link's href to a temporary URL for our in-memory blob
     link.href = URL.createObjectURL(blob);
-    
-    // Set the 'download' attribute to name the file
     link.setAttribute('download', `${setCode}_review.csv`);
     
-    // Append the link, click it, and then remove it
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -55,7 +47,6 @@ function DownloadButton({ reviews, setCode }) {
   return (
     <div>
       <hr style={{ margin: '20px 0' }} />
-      {/* This button is wired up to our handleDownload function */}
       <button 
         onClick={handleDownload}
         style={{ 
