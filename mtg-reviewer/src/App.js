@@ -8,7 +8,6 @@ import DownloadButton from './components/DownloadButton.js';
 import LoadingView from './components/LoadingView.js';
 import AllDoneView from './components/AllDoneView.js';
 import Navigation from './components/Navigation.js'; 
-// --- NEW: Import our new component ---
 import NotesInput from './components/NotesInput.js';
 
 // --- 2. Import all logic hooks ---
@@ -24,7 +23,6 @@ function App() {
 
   const { cards, isLoading, setCode } = useScryfall(); 
   
-  // --- NEW: Get the handleSaveNote function from our hook ---
   const { 
     reviews, 
     cardIndex, 
@@ -33,16 +31,13 @@ function App() {
     next, 
     goToNextUnrated,
     goToPreviousUnrated,
-    handleSaveNote // <-- This function is new
+    handleSaveNote
   } = useReview(cards.length, cards);
   
   // --- Derived State ---
   
   const currentCard = cards[cardIndex];
-
-  // This line finds the grade for the current card.
   const currentGrade = reviews[currentCard?.name]?.grade;
-  // --- NEW: Find the note for the current card ---
   const currentNote = reviews[currentCard?.name]?.notes;
 
   // --- TOP-LEVEL RENDER LOGIC (The Manager's Job) ---
@@ -71,41 +66,53 @@ function App() {
   } else {
     // 3. The Happy Path: Render all our components
     mainContent = (
-      <>
-        <CardViewer 
-          card={currentCard} 
-        />
+      // --- NEW: Two-column Flexbox layout ---
+      <div style={{ display: 'flex', gap: '20px' }}>
         
-        <Navigation 
-          onGoBack={goBack}
-          onNext={next}
-          onGoToNextUnrated={goToNextUnrated}
-          onGoToPreviousUnrated={goToPreviousUnrated}
-          canGoBack={cardIndex > 0}
-          canNext={!!currentCard}
-          currentGrade={currentGrade}
-        />
+        {/* --- Left Column (Card) --- */}
+        <div style={{ width: '400px', flexShrink: 0 }}>
+          <CardViewer 
+            card={currentCard} 
+          />
+        </div>
+        
+        {/* --- Right Column (Controls) --- */}
+        <div style={{ width: '100%' }}>
+          <Navigation 
+            onGoBack={goBack}
+            onNext={next}
+            onGoToNextUnrated={goToNextUnrated}
+            onGoToPreviousUnrated={goToPreviousUnrated}
+            canGoBack={cardIndex > 0}
+            canNext={!!currentCard}
+            currentGrade={currentGrade}
+          />
 
-        <GradeButtons 
-          onGrade={handleGrade}
-          currentCard={currentCard}
-          currentGrade={currentGrade} 
-        />
-        
-        {/* --- NEW: Add the NotesInput component --- */}
-        <NotesInput 
-          currentNote={currentNote}
-          // We must pass the card name so the hook knows which card to save
-          onSaveNote={(noteText) => handleSaveNote(currentCard.name, noteText)}
-        />
-      </>
+          <GradeButtons 
+            onGrade={handleGrade}
+            currentCard={currentCard}
+            currentGrade={currentGrade} 
+          />
+          
+          <NotesInput 
+            currentNote={currentNote}
+            onSaveNote={(noteText) => handleSaveNote(currentCard.name, noteText)}
+          />
+          
+          <DownloadButton
+            reviews={reviews}
+            setCode={setCode}
+          />
+        </div>
+      </div>
     );
   }
 
   // --- Final Render ---
   
   return (
-    <div style={{ padding: '20px', maxWidth: '400px', margin: 'auto' }}>
+    // --- NEW: Widened the container for two columns ---
+    <div style={{ padding: '20px', maxWidth: '850px', margin: 'auto' }}>
       
       <h2>
         {setCode.toUpperCase()} Set Review ({isLoading ? '...' : cardIndex} / {cards.length})
@@ -113,10 +120,9 @@ function App() {
       
       {mainContent}
 
-      <DownloadButton
-        reviews={reviews}
-        setCode={setCode}
-      />
+      {/* NOTE: DownloadButton was moved *inside* the right column 
+        so it stays with the controls.
+      */}
       
     </div>
   );
