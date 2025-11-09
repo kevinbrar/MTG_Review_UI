@@ -40,6 +40,18 @@ function App() {
   const currentGrade = reviews[currentCard?.name]?.grade;
   const currentNote = reviews[currentCard?.name]?.notes;
 
+  // --- NEW: Helper variable for 1-indexed display ---
+  let displayIndex;
+  if (isLoading) {
+    displayIndex = '...';
+  } else if (!currentCard) {
+    // We are in the "All Done" state
+    displayIndex = cards.length;
+  } else {
+    // We are viewing a card, so add 1 for display
+    displayIndex = cardIndex + 1;
+  }
+
   // --- TOP-LEVEL RENDER LOGIC (The Manager's Job) ---
   
   let mainContent;
@@ -66,7 +78,6 @@ function App() {
   } else {
     // 3. The Happy Path: Render all our components
     mainContent = (
-      // --- NEW: Two-column Flexbox layout ---
       <div style={{ display: 'flex', gap: '20px' }}>
         
         {/* --- Left Column (Card) --- */}
@@ -111,18 +122,14 @@ function App() {
   // --- Final Render ---
   
   return (
-    // --- NEW: Widened the container for two columns ---
     <div style={{ padding: '20px', maxWidth: '850px', margin: 'auto' }}>
       
       <h2>
-        {setCode.toUpperCase()} Set Review ({isLoading ? '...' : cardIndex} / {cards.length})
+        {/* --- UPDATED: Use the 1-indexed displayIndex --- */}
+        {setCode.toUpperCase()} Set Review ({displayIndex} / {cards.length})
       </h2>
       
       {mainContent}
-
-      {/* NOTE: DownloadButton was moved *inside* the right column 
-        so it stays with the controls.
-      */}
       
     </div>
   );
