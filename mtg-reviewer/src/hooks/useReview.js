@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-// --- NEW: Import all our business logic ---
+// --- Import all our business logic ---
 import {
   createGradedReview,
   createNotedReview,
@@ -33,13 +33,14 @@ function useReview(totalCards, cards) {
       const resumeIndex = findNextUnratedIndex(-1, totalCards, cards, parsedReviews);
       setCardIndex(resumeIndex);
     }
-  }, [totalCards, cards]); // Added 'cards' as dependency
+  }, [totalCards, cards, setReviews, setCardIndex]); // <-- UPDATED: Added setters to satisfy the linter.
 
   
   // --- State Update Functions ---
 
   /**
-   * Saves a grade for a card, updates localStorage, and advances to the next card.
+   * Saves a grade for a card, updates localStorage, and advances to the next card
+   * *after a short delay*.
    */
   const handleGrade = (cardName, grade) => {
     const currentCard = cards.find(c => c.name === cardName);
@@ -48,11 +49,15 @@ function useReview(totalCards, cards) {
     // Get the new reviews object from our utility function
     const newReviews = createGradedReview(reviews, cardName, grade, currentCard);
     
+    // STEP 1: Save and re-render immediately.
     setReviews(newReviews);
     localStorage.setItem(`${SET_CODE}_review`, JSON.stringify(newReviews));
     
+    // STEP 2: Wait 300ms, then advance the card.
     if (cardIndex < totalCards) {
-      setCardIndex(cardIndex + 1);
+      setTimeout(() => {
+        setCardIndex(cardIndex + 1);
+      }, 75); // 75ms = 0.075 second delay
     }
   };
   

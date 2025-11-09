@@ -1,0 +1,34 @@
+/* This is our "flush button" grid. 
+   It creates 3 equal-width columns with no gaps. */
+.gradeRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 2px; /* A tiny gap to create a "border" effect */
+  margin-bottom: 2px;
+}
+
+.gradeButton {
+  padding: 20px 10px; /* Make buttons tall and easy to click */
+  font-size: 18px;
+  font-weight: bold;
+  border: 1px solid #ccc;
+  background-color: #f0f0f0; /* Default "stone" color */
+  color: #333; /* Dark text for light background */
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.gradeButton:hover {
+  background-color: #e9e9e9;
+}
+
+/* "Rated" state indicator.
+ * When a button has the .selected class, it will look "pressed in"
+*/
+.selected {
+  background-color: #007bff; /* Blue "selected" color */
+  color: white;
+  border-color: #0056b3;
+  transform: scale(0.98);
+  box-shadow: inset 0px 0px 8px rgba(0, 0, 0, 0.2);
+}

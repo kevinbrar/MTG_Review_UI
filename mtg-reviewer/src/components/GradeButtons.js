@@ -1,58 +1,71 @@
 import React from 'react';
+import GradeRow from './GradeRow.js'; // Import our new component
+import styles from './GradeButtons.module.css'; // Import its new stylesheet
 
 /**
- * A "dumb" UI component that renders the grid of grade buttons.
- * It receives the current card and a callback function (`onGrade`) as props.
- * When a button is clicked, it calls `onGrade` with the card's name and the selected grade.
+ * A "dumb" UI component that renders the *entire* grid of grade buttons.
+ * It acts as a "manager" that renders <GradeRow /> components.
  *
  * @param {object} props - The component props.
- * @param {function} props.onGrade - The callback function from `useReview` to save the grade.
+ * @param {function} props.onGrade - The callback function from `useReview`.
  * @param {object} props.currentCard - The card object currently being viewed.
+ * @param {string} props.currentGrade - The currently selected grade (e.g., "A+").
  */
-function GradeButtons({ onGrade, currentCard }) {
-  // --- V2 Change ---
-  // Updated the grades array per your request.
-  // We removed 'F' and added 'D+' and 'D-'.
-  const grades = [
-    'A+', 'A', 'A-', 
-    'B+', 'B', 'B-', 
-    'C+', 'C', 'C-', 
-    'D+', 'D', 'D-',
-    'G'
-    // We can also add 'G' back if you want, but this is a clean 12
-  ];
+function GradeButtons({ onGrade, currentCard, currentGrade }) {
   
   // Guard Clause: If there is no card (still loading or end of list), 
   // render nothing (null).
   if (!currentCard) {
     return null;
   }
-  
+
   /**
-   * Internal helper function to handle a button click.
-   * It "lifts state up" by calling the `onGrade` prop (which is the
-   * `handleGrade` function from our `useReview` hook).
-   * @param {string} grade - The grade (e.g., "A+") that was clicked.
+   * Internal helper to build the CSS class list for the "G" button.
+   * @returns {string} The final CSS class string.
    */
-  const handleButtonClick = (grade) => {
-    // Call the function passed down from App.js
-    onGrade(currentCard.name, grade);
+  const getGButtonStyle = () => {
+    let classes = [styles.goodArtButton];
+    if (currentGrade === 'G') {
+      classes.push(styles.selected);
+    }
+    return classes.join(' ');
   };
 
   return (
-    <div style={{ marginTop: '15px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+    <div className={styles.gradeButtonContainer}>
+      {/* --- A, B, C, D Rows --- */}
+      <GradeRow 
+        baseGrade="A"
+        currentGrade={currentGrade}
+        onGrade={onGrade}
+        currentCard={currentCard}
+      />
+      <GradeRow 
+        baseGrade="B"
+        currentGrade={currentGrade}
+        onGrade={onGrade}
+        currentCard={currentCard}
+      />
+      <GradeRow 
+        baseGrade="C"
+        currentGrade={currentGrade}
+        onGrade={onGrade}
+        currentCard={currentCard}
+      />
+      <GradeRow 
+        baseGrade="D"
+        currentGrade={currentGrade}
+        onGrade={onGrade}
+        currentCard={currentCard}
+      />
       
-      {/* This is the "list comprehension" of React.
-        We map over the `grades` array and render a <button> element for each one.
-      */}
-      {grades.map((grade) => (
-        <button 
-          key={grade} 
-          onClick={() => handleButtonClick(grade)}
-        >
-          {grade}
-        </button>
-      ))}
+      {/* --- "G" (Good Art) Button --- */}
+      <button 
+        className={getGButtonStyle()}
+        onClick={() => onGrade(currentCard.name, 'G')}
+      >
+        Good Art
+      </button>
     </div>
   );
 }
