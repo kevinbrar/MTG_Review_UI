@@ -57,7 +57,7 @@ function useReview(totalCards, cards) {
     if (cardIndex < totalCards) {
       setTimeout(() => {
         setCardIndex(cardIndex + 1);
-      }, 75); // 75ms = 0.075 second delay
+      }, 150); // 150ms = 0.15 second delay
     }
   };
   
