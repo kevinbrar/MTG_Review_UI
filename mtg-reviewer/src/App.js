@@ -5,10 +5,11 @@ import './App.css';
 import CardViewer from './components/CardViewer.js';
 import GradeButtons from './components/GradeButtons.js';
 import DownloadButton from './components/DownloadButton.js';
-
-// --- V2 Refactor: New Placeholder Components ---
 import LoadingView from './components/LoadingView.js';
 import AllDoneView from './components/AllDoneView.js';
+import Navigation from './components/Navigation.js'; 
+// --- NEW: Import our new component ---
+import NotesInput from './components/NotesInput.js';
 
 // --- 2. Import all logic hooks ---
 import useScryfall from './hooks/useScryfall.js';
@@ -17,50 +18,85 @@ import useReview from './hooks/useReview.js';
 /**
  * The main application component.
  * Acts as the "manager" that connects all components and hooks.
- * It implements the top-level logic (Loading, All Done) to decide 
- * which view to render.
  */
 function App() {
   // --- Smart Hooks (The "Brain") ---
 
-  // Get all card data and status from our Scryfall hook.
   const { cards, isLoading, setCode } = useScryfall(); 
   
-  // V2 CHANGE: Pass the 'cards' list to useReview so it can save metadata.
-  // This is the line that needs to change from the current state:
-  const { reviews, cardIndex, handleGrade } = useReview(cards.length, cards);
+  // --- NEW: Get the handleSaveNote function from our hook ---
+  const { 
+    reviews, 
+    cardIndex, 
+    handleGrade, 
+    goBack, 
+    next, 
+    goToNextUnrated,
+    goToPreviousUnrated,
+    handleSaveNote // <-- This function is new
+  } = useReview(cards.length, cards);
   
   // --- Derived State ---
   
-  // Helper to get the *exact* card we're currently looking at
   const currentCard = cards[cardIndex];
+
+  // This line finds the grade for the current card.
+  const currentGrade = reviews[currentCard?.name]?.grade;
+  // --- NEW: Find the note for the current card ---
+  const currentNote = reviews[currentCard?.name]?.notes;
 
   // --- TOP-LEVEL RENDER LOGIC (The Manager's Job) ---
   
   let mainContent;
 
   if (isLoading) {
-    // 1. If we are loading data, show the loading placeholder.
     mainContent = <LoadingView />;
     
   } else if (!currentCard) {
-    // 2. If we are NOT loading, but there's no currentCard (end of list), 
-    //    show the "All Done" view.
-    mainContent = <AllDoneView />;
-    
-  } else {
-    // 3. The Happy Path: Render the card and buttons.
     mainContent = (
       <>
-        {/* Pass card data to the viewer */}
+        <AllDoneView />
+        <div style={{ marginTop: '10px' }}>
+          <button 
+            onClick={goBack} 
+            disabled={cardIndex === 0}
+            style={{ width: '100%', padding: '8px' }}
+          >
+            &larr; Go Back
+          </button>
+        </div>
+      </>
+    );
+    
+  } else {
+    // 3. The Happy Path: Render all our components
+    mainContent = (
+      <>
         <CardViewer 
           card={currentCard} 
         />
         
-        {/* Pass the grading function and current card to the buttons */}
+        <Navigation 
+          onGoBack={goBack}
+          onNext={next}
+          onGoToNextUnrated={goToNextUnrated}
+          onGoToPreviousUnrated={goToPreviousUnrated}
+          canGoBack={cardIndex > 0}
+          canNext={!!currentCard}
+          currentGrade={currentGrade}
+        />
+
         <GradeButtons 
           onGrade={handleGrade}
           currentCard={currentCard}
+          currentGrade={currentGrade} 
+        />
+        
+        {/* --- NEW: Add the NotesInput component --- */}
+        <NotesInput 
+          currentNote={currentNote}
+          // We must pass the card name so the hook knows which card to save
+          onSaveNote={(noteText) => handleSaveNote(currentCard.name, noteText)}
         />
       </>
     );
@@ -72,13 +108,11 @@ function App() {
     <div style={{ padding: '20px', maxWidth: '400px', margin: 'auto' }}>
       
       <h2>
-        {/* Use setCode in the title, and show a loading fallback */}
         {setCode.toUpperCase()} Set Review ({isLoading ? '...' : cardIndex} / {cards.length})
       </h2>
       
       {mainContent}
 
-      {/* The Download button always appears */}
       <DownloadButton
         reviews={reviews}
         setCode={setCode}
