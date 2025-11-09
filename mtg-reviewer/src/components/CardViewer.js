@@ -11,13 +11,8 @@ import React, { useState } from 'react';
  */
 function CardViewer({ card }) {
   
-  // --- This component still manages its own DFC flip state ---
   const [isFlipped, setIsFlipped] = useState(false);
   
-  // --- All `isLoading` and `!card` logic has been REMOVED ---
-  // The "manager" (App.js) is now responsible for that.
-  
-  // --- Robust Image URL Finding ---
   const isDfc = card.card_faces && card.card_faces.length > 0;
   
   let imageUrl = "https://placehold.co/265x370?text=Image+Not+Found"; // Default placeholder
@@ -39,10 +34,19 @@ function CardViewer({ card }) {
       <img 
         src={imageUrl} 
         alt={card.name} 
-        style={{ width: '100%', borderRadius: '15px' }} 
+        style={{ 
+          width: '100%', 
+          borderRadius: '5px',
+          
+          /* --- NEW CODE --- */
+          /* Add a simple, thematic "stone" border */
+          border: '4px solid #414244ff', /* A dark stone-gray color */
+          boxShadow: '0 4px 12px rgba(201, 189, 189, 0.1)', /* A stronger shadow */
+          boxSizing: 'border-box' /* Ensures border is included in width */
+          /* --- END NEW CODE --- */
+        }} 
       />
       
-      {/* The "Flip" button logic is still here, as it's card-specific */}
       {isDfc && (
         <button 
           onClick={handleFlip}

@@ -12,8 +12,6 @@
   transition: all 0.1s ease;
   width: 100%;
   margin-top: 2px; 
-  
-  /* --- UPDATED: Matched the lighter gray --- */
   background-color: #f0f0f0;
   color: #333;
 }
@@ -26,9 +24,9 @@
    so the "G" button has the same "inlayed" effect when selected.
 */
 .selected {
-  background-color: #007bff;
-  color: white;
-  border-color: #0056b3;
+  background-color: #d1e7dd; /* --- NEW: Pastel Green --- */
+  color: #155724; /* --- NEW: Dark Green Text --- */
+  border-color: #a3c4ab; /* --- NEW: Green Border --- */
   transform: scale(0.98);
   box-shadow: inset 0px 0px 8px rgba(0, 0, 0, 0.2);
 }

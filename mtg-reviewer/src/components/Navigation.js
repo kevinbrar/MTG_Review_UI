@@ -6,12 +6,12 @@ import React from 'react';
  *
  * @param {object} props - The component props.
  * @param {function} props.onGoBack - The function to call when "Previous" is clicked.
- * @param {function} props.onNext - The function to call when "Next" is clicked.
+ * @param {function} props.onNext - The function to call when "Next" is
+... (omitted due to length)
  * @param {function} props.onGoToNextUnrated - The function for "Next Unrated".
  * @param {function} props.onGoToPreviousUnrated - The function for "Previous Unrated".
  * @param {boolean} props.canGoBack - True if the "Previous" button should be enabled.
  * @param {boolean} props.canNext - True if the "Next" button should be enabled.
- * @param {string} props.currentGrade - The grade (e.g., "A+") for the current card.
  */
 function Navigation({ 
   onGoBack, 
@@ -19,8 +19,8 @@ function Navigation({
   onGoToNextUnrated,
   onGoToPreviousUnrated,
   canGoBack, 
-  canNext, 
-  currentGrade 
+  canNext 
+  /* currentGrade prop removed */
 }) {
   
   // Style for the new "Unrated" buttons to make them distinct
@@ -43,16 +43,7 @@ function Navigation({
           &larr; Previous
         </button>
 
-        <span style={{
-          fontSize: '24px',
-          fontWeight: 'bold',
-          color: 'black',
-          fontFamily: 'sans-serif',
-          position: 'relative',
-          right: '15px'
-        }}>
-          {currentGrade || ''}
-        </span>
+        {/* --- The grade letter <span> has been removed --- */}
 
         <button 
           onClick={onNext} 
