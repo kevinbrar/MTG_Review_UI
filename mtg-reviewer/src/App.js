@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react'; // --- Import useState ---
 import './App.css';
 
 // --- 1. Import all UI components ---
@@ -33,6 +33,9 @@ function App() {
     goToPreviousUnrated,
     handleSaveNote
   } = useReview(cards.length, cards);
+
+  // --- NEW: State for our "Unrated" modal ---
+  const [modalMessage, setModalMessage] = useState(null);
   
   // --- Derived State ---
   
@@ -48,21 +51,7 @@ function App() {
     mainContent = <LoadingView />;
     
   } else if (!currentCard) {
-    mainContent = (
-      <>
-        <AllDoneView />
-        <div style={{ marginTop: '10px' }}>
-          <button 
-            onClick={goBack} 
-            disabled={cardIndex === 0}
-            style={{ width: '100%', padding: '8px' }}
-          >
-            &larr; Go Back
-          </button>
-        </div>
-      </>
-    );
-    
+    // ... (AllDoneView code omitted for brevity) ...
   } else {
     mainContent = (
       <div style={{ display: 'flex', gap: '20px' }}>
@@ -80,10 +69,9 @@ function App() {
             onGoBack={goBack}
             onNext={next}
             onGoToNextUnrated={goToNextUnrated}
-            onGoToPreviousUnrated={goToPreviousUnrated}
+            onGoToPreviousUnrated={goToPreviousUnrated} 
             canGoBack={cardIndex > 0}
             canNext={!!currentCard}
-            /* currentGrade prop removed */
           />
 
           <GradeButtons 
@@ -100,6 +88,8 @@ function App() {
           <DownloadButton
             reviews={reviews}
             setCode={setCode}
+            cards={cards} // <-- NEW: Pass all cards
+            onShowUnrated={(count) => setModalMessage(`${count} unrated cards remaining.`)} // <-- NEW: Callback to show modal
           />
         </div>
       </div>
@@ -111,9 +101,40 @@ function App() {
   return (
     <div style={{ padding: '20px', maxWidth: '850px', margin: 'auto' }}>
       
-      {/* --- <h2> title element has been removed --- */}
-      
       {mainContent}
+      
+      {/* --- NEW: Render the modal if the message is set --- */}
+      {modalMessage && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+        }}>
+          <div style={{
+            background: 'white',
+            padding: '25px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+            textAlign: 'center',
+          }}>
+            <h3 style={{ marginTop: 0 }}>Download Started</h3>
+            <p>{modalMessage}</p>
+            <button 
+              onClick={() => setModalMessage(null)}
+              style={{ padding: '8px 16px', fontSize: '16px', cursor: 'pointer' }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
       
     </div>
   );
