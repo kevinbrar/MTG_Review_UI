@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-// --- Import all our business logic ---
+// --- NEW: Import all our business logic ---
 import {
   createGradedReview,
   createNotedReview,
@@ -33,7 +33,7 @@ function useReview(totalCards, cards) {
       const resumeIndex = findNextUnratedIndex(-1, totalCards, cards, parsedReviews);
       setCardIndex(resumeIndex);
     }
-  }, [totalCards, cards, setReviews, setCardIndex]); // <-- UPDATED: Added setters to satisfy the linter.
+  }, [totalCards, cards, setReviews, setCardIndex]);
 
   
   // --- State Update Functions ---
@@ -46,18 +46,18 @@ function useReview(totalCards, cards) {
     const currentCard = cards.find(c => c.name === cardName);
     if (!currentCard) return; 
 
-    // Get the new reviews object from our utility function
+    // --- FIXED: Actually use the utility function ---
     const newReviews = createGradedReview(reviews, cardName, grade, currentCard);
     
     // STEP 1: Save and re-render immediately.
     setReviews(newReviews);
     localStorage.setItem(`${SET_CODE}_review`, JSON.stringify(newReviews));
     
-    // STEP 2: Wait 300ms, then advance the card.
+    // STEP 2: Wait 75ms, then advance the card.
     if (cardIndex < totalCards) {
       setTimeout(() => {
         setCardIndex(cardIndex + 1);
-      }, 150); // 150ms = 0.15 second delay
+      }, 75); // Your 75ms tactile delay
     }
   };
   
@@ -68,7 +68,7 @@ function useReview(totalCards, cards) {
     const currentCard = cards.find(c => c.name === cardName);
     if (!currentCard) return; // Safety check
 
-    // Get the new reviews object from our utility function
+    // --- FIXED: Actually use the utility function ---
     const newReviews = createNotedReview(reviews, cardName, noteText, currentCard);
     
     setReviews(newReviews);
@@ -76,26 +76,38 @@ function useReview(totalCards, cards) {
   };
 
 
-  // --- Navigation Functions ---
+  // --- Navigation Functions (FIXED: Definitions re-added) ---
 
+  /**
+   * Moves the card index back by one, with a floor of 0.
+   */
   const goBack = () => {
     if (cardIndex > 0) {
       setCardIndex(cardIndex - 1);
     }
   };
 
+  /**
+   * Moves the card index forward by one, with a ceiling of totalCards.
+   */
   const next = () => {
     if (cardIndex < totalCards) {
       setCardIndex(cardIndex + 1);
     }
   };
 
+  /**
+   * Finds the next card in the list that does not have a grade.
+   */
   const goToNextUnrated = () => {
     // Call the utility function to find the next unrated index
     const nextIndex = findNextUnratedIndex(cardIndex, totalCards, cards, reviews);
     setCardIndex(nextIndex);
   };
 
+  /**
+   * Finds the previous card in the list that does not have a grade.
+   */
   const goToPreviousUnrated = () => {
     // Call the utility function to find the previous unrated index
     const prevIndex = findPreviousUnratedIndex(cardIndex, cards, reviews);
