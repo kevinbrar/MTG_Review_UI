@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { sortCards } from '../utils/cardSorter.js';
 
 // The set code to fetch from Scryfall.
-const SET_CODE = 'tla'; 
+const SET_CODE = 'ecl'; 
 
 /**
  * A custom React hook to fetch and cache Scryfall card data for a specific set.
